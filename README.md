@@ -2,7 +2,8 @@
 
 ## Requirements
 ### Data 
-Download and unzip study data at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24148227.svg)](https://doi.org/10.5281/zenodo.24148227).
+Download and unzip study data at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24148227.svg)](https://doi.org/10.5281/zenodo.24148227) 
+and [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24148429.svg)](https://doi.org/10.5281/zenodo.24148429).
 ### Data Analysis
 R 4.5.2 (or equivalent)  
 R Studio IDE (optional)  
