@@ -425,7 +425,7 @@ settlement %>%
   distinct(interval) %>% 
   nrow(.)/12
 
-# ---- Figure 9 ----
+# ---- Figure 10 ----
 data <- ic_flows %>% 
   filter(scenario %in% scenarios) %>% 
   mutate(direction = case_when(flow_hist < 0 | (link == "BLNKTAS" & flow_hist > 0) ~ "Import",

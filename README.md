@@ -1,25 +1,32 @@
 # Lessons_on_the_Economics_of_VT: Data Analysis, Statistics, Modelling and Results
 
 ## Requirements
-### Data Analaysis
+### Data 
+Download and unzip study data at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24148227.svg)](https://doi.org/10.5281/zenodo.24148227).
+### Data Analysis
 R 4.5.2 (or equivalent)  
 R Studio IDE (optional)  
-Tidyverse package (run `install.packages("tidyverse")`)
+Tidyverse package (run `install.packages("tidyverse")`)  
 Arrow package (run `install.packages("arrow")`)
 ### Counterfactual Simulation
 Python 3.11
-Gurobipy 13.0 and licence
+Gurobipy 13.0 and licence. We use an WLS Compute Server licence and ARDC Nectar Research Cloud virtual machines for simulation.
 ### Git
-Github
-https://github.com/loy-yang-c/Monash-NEMPY
+GitHub
+https://github.com/loy-yang-c/Monash-NEMPY  
 https://github.com/loy-yang-c/nempy-backend
 
+## Overview
+Download and unpack data → `data_analysis.R` → Alternative Scenario Simulation → `scenario_analysis.R`
+
+## Raw Data
+Raw data is scrapped from AEMO's publicly available Electricity Data Model and NEMWeb. For convenience, we provide this raw data through Zenodo.
 
 ## Secondary Data Creation
 ### vbb_sips_constraint_groups.csv
 Map VBB VT constraints from ./raw_data/genericconstraintrhs_ALL_VBB_SIPS.csv to groups. Multiple GENCONIDs map to the same constraint depending on system state.
 ### genconid_VBB_SIPS_mapping.csv
-For VBB, VT and non-VT constraints are duplicated. The in-active constraint is swamped. We map the VT and non-VT versions in this file, by finding the equivalent 
+For VBB, VT and non-VT constraints are duplicated. The inactivee constraint is swamped. We map the VT and non-VT versions in this file, by finding the equivalent 
 non-VT constraint in ./raw_data/genericconstraintrhs_SPDID_CONTAINS_SIP.csv for each GENCONID in ./raw_data/genericconstraintrhs_ALL_VBB_SIPS.csv
 ### Simulation Re-Dispatch Intervals
 historical_coi_XXXX.csv: superset of all scenario intervals being re-dispatched.  
@@ -40,15 +47,18 @@ See right-hand-side constraint formulations in, WSB: ./raw_data/genericconstrain
 ### Observed values:
 ./data_analysis.R
 
-## Figures 2, 3, 8
+## Figures 2, 3, 5, 9
 ./data_analysis.R
 
 ## Quoted Statistics: Lessons 2, 3
 ./data_analysis.R
 
+## Table 6
+See ./raw_data/genericconstraintrhs_V_NIL_ELML_BAML2.csv.
+
 ## Table 7
 See right-hand-side constraint formulations in, WSB: ./raw_data/genericconstraintrhs_wtah.csv, VBB: ./raw_data/genericconstraintrhs_vbb.xlsx and 
-./raw_data/genericequationrhs_VIC.csv
+./raw_data/genericequationrhs_VIC.csv.
 
 ## Table 8
 See mapping in ./secondary_data/genconid_VBB_SIPS_mapping.csv.
@@ -62,13 +72,13 @@ Create and load a virtual environment for Python 3.11. Windows Command Prompt:
 `.venv\Scripts\activate.bat`
 ### Step 3
 Clone Monash-NEMPY and nempy-backend repositories. Windows Command Prompt:  
-`pip install <nempy_backend filepath>`
+`pip install <repo filepath>`
 ### Step 4
-From step 1, we have generated intervals for each scenario in which the market require re-dispatch. Copy the 16 vni_contract_binding_XXXX.csv, 
+From step 1, we have generated intervals for each scenario in which the market requires re-dispatch. Copy the 16 vni_contract_binding_XXXX.csv, 
 arbe_elml_binding_XXXX.csv, vni_voltage_binding_XXXX.csv and wsb_thermal_binding_XXXX.csv from ./secondary_data/ to /Monash-NEMPY/input/.
 ### Step 5 
-NEMPY simulation requires a scrapped NEMWeb data files (partitioned into daily .loaded files) and an SQlite3 .db file. 
-The data is scenario-agnostic and need only to be scrapped once for each period. /Monash-NEMPY/input_data.py
+NEMPY simulation requires a scraped NEMWeb data files (partitioned into daily .loaded files) and an SQLite .db file. 
+The data is scenario-agnostic and need only be scraped once for each period. /Monash-NEMPY/input_data.py
 scrapes and stores the required data for simulation. Set `START_DATE` and `END_DATE`, and `DATA_PATH` and `MMS_DB_WRITE_PATH` in /Monash-NEMPY/vars.py and then 
 run the script (Windows Command Prompt: `python input_data.py`). We also provide a `MMS_DB_WRITE_APNDX` which allows the user to save multiple .db objects for 
 each simulation period. We maintain different .db objects in a cloud environment for better workflow.   
@@ -79,7 +89,7 @@ Edit /Monash-NEMPY/vars.py and save based on the following table. Execute /Monas
 | Scenario | CUSTOM_INTERVALS  | NEMPY_MODEL | <PERIODS> |
 |----------|-------------------|-------------|-----------|
 | v.1      |  "./input/vni_contract_binding_<PERIODS>.csv" | "vbb_sips_on-p.py" | SIPS1-SIPS5 |
-| v.2      |  "./input/arbe_elml_binding_<PERIODS>.csv" | "arbe_elml_relaxation-p.py" | SIPS1-SIPS5 |
+| v.2      |  "./input/arbe_elml_binding_<PERIODS>.csv" | "vni_arbe_elml_relaxation-p.py" | SIPS1-SIPS5 |
 | v.3      |  "./input/vni_voltage_binding_<PERIODS>.csv" | "vni_voltage_100-p.py" | SIPS1-SIPS5 |
 | w.1      |  "./input/wsb_thermal_binding_<PERIODS>.csv" | "wtah_sips_on-p.py" | SIPS5 |
 | w.2      |  "./input/wsb_thermal_binding_<PERIODS>.csv" | "wtah_350_flat-p.py" | SIPS5 |
@@ -103,12 +113,15 @@ provided for each simulation period. Refer to the following table:
 Lastly, we require historical constraint violations. Set `START_DATE`, `END_DATE` and `DATA_PATH` and `MMS_DB_WRITE_PATH`, 
 and using the same `RESULTS_PATH` paths as simulation, run /Monash-NEMPY/scrape_CVP.py (Windows Command Prompt: `python scrape_CVP.py`).
 ### Step 7
+Set up a results folder structure for .parquet outputs. This should follow ./results/<PERIOD>/<SCENARIO>/. Copy Step 5 .parquet files into these folders by the
+appropriate period and scenario. Copy CVP .parquet files into ./results/<PERIOD>/cvp/. ./results/ is now your `parquet_path`.
+### Step 8
 Results are stored as .parquet files and grouped into energy prices, FCAS prices, constraint marginal values, unit dispatch, interconnector flows
 and linear objective function value. In this step we use ./convert_simulation_parquet.R to convert results to an .RDS file for data analysis. Ensure that results are
 saved in the following format ".../<PERIOD>/<SCENARIO>/..." and set the `parquet_path` value at the top of the R script. The script will output 
 ./secondary_data/results.rds.
 
-## Figures 4, 9
+## Figures 4, 10
 ./simulation_analysis.R
 
 ## Tables 3, 4, 5, 9, 10

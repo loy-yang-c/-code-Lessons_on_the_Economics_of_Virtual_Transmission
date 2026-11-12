@@ -5,6 +5,13 @@ library(tidyverse)
 wsb_sips_avail <- read_csv("./raw_data/scrape_2025-07-31_2026-02-01.csv") %>% 
   select(-`...1`) %>% 
   mutate(interval = ymd_hms(interval))
+network_scrape <- read_csv("./raw_data/scrape_2021-11-29_2022-04-02.csv") %>% 
+  rbind(read_csv("./raw_data/scrape_2022-11-01_2023-04-02.csv")) %>%
+  rbind(read_csv("./raw_data/scrape_2023-11-01_2024-04-02.csv")) %>%
+  rbind(read_csv("./raw_data/scrape_2024-11-01_2025-04-02.csv")) %>%
+  rbind(read_csv("./raw_data/scrape_2025-07-31_2026-02-02.csv")) %>% 
+  select(-`...1`) %>% 
+  mutate(interval = ymd_hms(interval))
 wsb_rrat <- read_csv("./raw_data/network_realtimerating_NRAT_2025-07-31_present.csv")
 wsb_srat <- read_csv("./raw_data/network_staticrating_84_85_86_88.csv")
 wsb_dict <- read_csv("./raw_data/network_rating_nrat.csv")
@@ -517,7 +524,23 @@ dispatchconstraint %>%
   filter(MARGINALVALUE != 0) %>% 
   nrow(.)/12
   
-# ---- Extended Data: Figure 8 ----
+# ---- Extended Data: Figure 5 ----
+network_scrape %>% 
+  filter(substr(spd_id, 1, 6) == "VRAT15") %>% 
+  mutate(spd_id = substr(spd_id, nchar(spd_id)-4, 100)) %>% 
+  pivot_wider(names_from = ems_id, values_from = value) %>% 
+  filter(!is.na(`15MT`) & !is.na(LDSH)) %>% 
+  mutate(spd_id = case_when(spd_id == "_EPTT" ~ "EPTT",
+                            TRUE ~ spd_id),
+         diff = LDSH - `15MT`) %>% 
+  ggplot() +
+  geom_boxplot(aes(x = diff, y = spd_id)) +
+  xlab("MW") +
+  ylab("Line") +
+  xlim(-10, 10) +
+  theme_minimal()
+
+# ---- Extended Data: Figure 9 ----
 data <- dispatchconstraint %>% 
   filter(CONSTRAINTID %in% c(wtah_sips_constraints) &
            (SETTLEMENTDATE >= ymd_hms("2025-07-31 04:00:00") & SETTLEMENTDATE < ymd_hms("2026-02-01 04:00:00"))) %>% 
