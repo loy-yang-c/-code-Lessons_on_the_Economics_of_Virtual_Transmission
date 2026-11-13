@@ -1,0 +1,11 @@
+   cff-version: 1.2.0
+   message: "If you use this code, please cite it as below."
+   title: "Code for: [Paper title]"
+   authors:
+     - family-names: "Raniga"
+       given-names: "Raheel"
+       orcid: "https://orcid.org/0009-0003-6369-9541"
+     - family-names: "Leslie"
+       given-names: "Gordon"
+       orcid: "https://orcid.org/0000-0001-9071-2631"
+   license: MIT
